@@ -36,8 +36,8 @@ export default function RootLayout({
 		<html
 			lang="vi"
 			className={`${fraunces.variable} ${inter.variable} h-full`}>
-			<Analytics />
 			<body className="min-h-full">
+				<Analytics />
 				<Providers>{children}</Providers>
 			</body>
 		</html>
