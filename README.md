@@ -141,4 +141,4 @@ proxy.ts                 bảo vệ route (Next 16 middleware → proxy)
 
 ---
 
-Made with ☕ + ✂️
+Thiết kế & phát triển bởi **[Rinrinx28](https://github.com/rinrinx28)** · Made with ☕ + ✂️

@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { toast } from "sonner";
-import { ArrowRight, ScissorsLineDashed } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured, env } from "@/lib/env";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
+import { Logo } from "@/components/brand/logo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -73,7 +74,7 @@ export default function LoginPage() {
 
         <div className="lg-brand relative flex h-full flex-col justify-between p-12">
           <div className="flex items-center gap-2.5 text-copper-deep">
-            <ScissorsLineDashed className="size-6" />
+            <Logo className="size-8" />
             <span className="font-display text-lg font-semibold tracking-tight">FADE OS</span>
           </div>
           <div className="max-w-md">
@@ -85,7 +86,17 @@ export default function LoginPage() {
               mượt mà và rõ ràng.
             </p>
           </div>
-          <p className="text-sm text-ink-muted">© {new Date().getFullYear()} {env.shopName}</p>
+          <p className="text-sm text-ink-muted">
+            © {new Date().getFullYear()} {env.shopName} · thiết kế bởi{" "}
+            <a
+              href="https://github.com/rinrinx28"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-copper-deep hover:underline"
+            >
+              Rinrinx28
+            </a>
+          </p>
         </div>
       </aside>
 
@@ -93,7 +104,7 @@ export default function LoginPage() {
       <main className="flex items-center justify-center px-6 py-12">
         <form onSubmit={handleSubmit} className="lg-form w-full max-w-sm">
           <div className="mb-8 flex items-center gap-2.5 text-copper-deep lg:hidden">
-            <ScissorsLineDashed className="size-6" />
+            <Logo className="size-8" />
             <span className="font-display text-lg font-semibold tracking-tight">FADE OS</span>
           </div>
           <h2 className="font-display text-3xl font-medium tracking-tight text-ink">Đăng nhập</h2>

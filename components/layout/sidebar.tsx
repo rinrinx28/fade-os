@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ScissorsLineDashed } from "lucide-react";
 import { navForRole } from "@/lib/nav";
 import { useSession } from "@/components/providers/session";
+import { Logo, GithubMark } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
 import type { AccessRole } from "@/lib/types/db";
 
@@ -25,9 +25,7 @@ export function Sidebar({ role, onNavigate }: { role: AccessRole; onNavigate?: (
         onClick={onNavigate}
         className="flex items-center gap-2.5 px-6 py-5 text-copper-deep"
       >
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-copper to-copper-deep text-white shadow-(--shadow-copper)">
-          <ScissorsLineDashed className="size-5" />
-        </span>
+        <Logo className="size-9 shrink-0 [filter:drop-shadow(0_3px_7px_rgba(176,112,58,0.32))]" />
         <span className="flex min-w-0 flex-col">
           <span className="font-display text-lg font-semibold leading-tight tracking-tight text-ink">FADE OS</span>
           <span className="truncate text-xs text-ink-muted">{shopName}</span>
@@ -66,10 +64,16 @@ export function Sidebar({ role, onNavigate }: { role: AccessRole; onNavigate?: (
         })}
       </nav>
 
-      <div className="px-6 py-4">
-        <p className="text-[0.7rem] leading-relaxed text-ink-faint">
-          Phiên bản 1.0 · Vận hành tiệm tóc thông minh
-        </p>
+      <div className="space-y-1.5 px-6 py-4 text-[0.7rem] leading-relaxed text-ink-faint">
+        <p>Phiên bản 1.0 · Vận hành tiệm tóc</p>
+        <a
+          href="https://github.com/rinrinx28"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 font-medium text-ink-muted transition-colors hover:text-copper-deep"
+        >
+          <GithubMark className="size-3" /> Thiết kế bởi Rinrinx28
+        </a>
       </div>
     </div>
   );
