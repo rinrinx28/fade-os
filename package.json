@@ -1,0 +1,45 @@
+{
+  "name": "fade-os",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:push": "node --env-file=.env.local scripts/db.mjs supabase/migrations/0001_init.sql supabase/migrations/0002_members.sql supabase/migrations/0003_cash_received.sql supabase/migrations/0004_roles_settlements.sql supabase/migrations/0005_soft_remove.sql supabase/migrations/0006_multi_tenant.sql",
+    "db:seed": "node --env-file=.env.local scripts/db.mjs supabase/seed.sql",
+    "user:create": "node --env-file=.env.local scripts/create-user.mjs",
+    "user:delete": "node --env-file=.env.local scripts/delete-user.mjs",
+    "owner:delete": "node --env-file=.env.local scripts/delete-owner.mjs",
+    "pass:reset": "node --env-file=.env.local scripts/set-password.mjs"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.108.2",
+    "@tanstack/react-query": "^5.101.0",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
+    "gsap": "^3.15.0",
+    "lucide-react": "^1.21.0",
+    "next": "16.2.9",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.6.0",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.9",
+    "pg": "^8.22.0",
+    "playwright": "^1.61.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

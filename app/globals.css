@@ -1,0 +1,205 @@
+@import "tailwindcss";
+
+/* ════════════════════════════════════════════════════════════════
+   FADE OS — Design tokens (Light Luxury Minimal)
+   Kem ấm · mực espresso · accent đồng/đỏ đất · serif Fraunces
+   ════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Surfaces */
+  --cream: oklch(97.6% 0.008 83);
+  --paper: oklch(99.4% 0.004 83);
+  --paper-2: oklch(96.2% 0.009 80);
+  --overlay: oklch(22% 0.02 60 / 0.42);
+
+  /* Ink */
+  --ink: oklch(23% 0.013 55);
+  --ink-soft: oklch(38% 0.013 55);
+  --ink-muted: oklch(56% 0.012 60);
+  --ink-faint: oklch(72% 0.01 65);
+
+  /* Lines */
+  --line: oklch(89% 0.009 75);
+  --line-strong: oklch(82% 0.012 70);
+
+  /* Accent — đồng/bronze */
+  --copper: oklch(58% 0.108 52);
+  --copper-deep: oklch(50% 0.112 48);
+  --copper-bright: oklch(66% 0.12 58);
+  --copper-soft: oklch(93.5% 0.03 68);
+  --copper-tint: oklch(95.8% 0.018 70);
+
+  /* Trạng thái */
+  --success: oklch(56% 0.11 150);
+  --success-soft: oklch(94% 0.04 150);
+  --danger: oklch(55% 0.16 27);
+  --danger-soft: oklch(94% 0.045 27);
+  --warning: oklch(72% 0.13 72);
+  --warning-soft: oklch(95% 0.05 78);
+  --info: oklch(52% 0.09 240);
+  --info-soft: oklch(94% 0.03 240);
+
+  /* Hiệu ứng */
+  --shadow-sm: 0 1px 2px oklch(30% 0.02 60 / 0.05), 0 1px 3px oklch(30% 0.02 60 / 0.04);
+  --shadow-md: 0 4px 12px oklch(30% 0.02 60 / 0.06), 0 2px 6px oklch(30% 0.02 60 / 0.05);
+  --shadow-lg: 0 18px 48px oklch(28% 0.02 55 / 0.12), 0 6px 16px oklch(28% 0.02 55 / 0.08);
+  --shadow-copper: 0 8px 28px oklch(58% 0.108 52 / 0.28);
+
+  --radius: 0.875rem;
+
+  /* Easing chữ ký */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 160ms;
+  --dur-normal: 320ms;
+  --dur-slow: 560ms;
+}
+
+@theme inline {
+  --color-cream: var(--cream);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-overlay: var(--overlay);
+
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-copper: var(--copper);
+  --color-copper-deep: var(--copper-deep);
+  --color-copper-bright: var(--copper-bright);
+  --color-copper-soft: var(--copper-soft);
+  --color-copper-tint: var(--copper-tint);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-inter);
+
+  --radius-xl: var(--radius);
+  --radius-2xl: 1.25rem;
+
+  --shadow-soft: var(--shadow-md);
+  --shadow-float: var(--shadow-lg);
+
+  --ease-expo: var(--ease-out-expo);
+  --ease-back: var(--ease-out-back);
+}
+
+/* ── Base ─────────────────────────────────────────────────────── */
+* {
+  border-color: var(--line);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-color: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hạt giấy mờ tạo chiều sâu sang trọng */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: radial-gradient(
+    oklch(55% 0.04 60 / 0.05) 0.5px,
+    transparent 0.6px
+  );
+  background-size: 4px 4px;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display), Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: var(--copper-soft);
+  color: var(--copper-deep);
+}
+
+/* Số dạng tabular cho tiền */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* ── Focus ring ───────────────────────────────────────────────── */
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--copper);
+  outline-offset: 2px;
+  border-radius: calc(var(--radius) - 4px);
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border: 3px solid var(--cream);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-faint);
+}
+
+/* ── Tiện ích layer ──────────────────────────────────────────── */
+@layer utilities {
+  .glass {
+    background: oklch(99.4% 0.004 83 / 0.72);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  }
+  .text-gradient-copper {
+    background: linear-gradient(100deg, var(--copper-deep), var(--copper-bright));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* Ẩn trước khi GSAP reveal — tránh nháy nội dung */
+  .gsap-pre {
+    opacity: 0;
+  }
+}
+
+/* ── Tôn trọng reduced-motion ─────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .gsap-pre {
+    opacity: 1 !important;
+  }
+}
