@@ -3,12 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { KeyRound, LogOut } from "lucide-react";
+import { KeyRound, LogOut, Check } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { clearMustChangePassword } from "@/app/actions/account";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/field";
+import { Field } from "@/components/ui/field";
+import { PasswordInput } from "@/components/ui/password-input";
 import { viAuthError } from "@/lib/auth-errors";
+
+const MIN_LEN = 6;
 
 export function ForcePasswordChange({ email }: { email: string }) {
   const router = useRouter();
@@ -16,10 +19,15 @@ export function ForcePasswordChange({ email }: { email: string }) {
   const [pw2, setPw2] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const tooShort = pw.length > 0 && pw.length < MIN_LEN;
+  const mismatch = pw2.length > 0 && pw !== pw2;
+  const matched = pw.length >= MIN_LEN && pw === pw2;
+  const canSubmit = pw.length >= MIN_LEN && pw === pw2 && !loading;
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (pw.length < 6) {
-      toast.error("Mật khẩu tối thiểu 6 ký tự.");
+    if (pw.length < MIN_LEN) {
+      toast.error(`Mật khẩu tối thiểu ${MIN_LEN} ký tự.`);
       return;
     }
     if (pw !== pw2) {
@@ -65,16 +73,42 @@ export function ForcePasswordChange({ email }: { email: string }) {
         </p>
 
         <div className="mt-6 flex flex-col gap-4">
-          <Field label="Mật khẩu mới" required hint="Phải khác mật khẩu tạm chủ tiệm cấp">
-            <Input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="Tối thiểu 6 ký tự" autoFocus />
+          <Field
+            label="Mật khẩu mới"
+            required
+            error={tooShort ? `Tối thiểu ${MIN_LEN} ký tự.` : undefined}
+            hint={tooShort ? undefined : "Phải khác mật khẩu tạm chủ tiệm cấp"}
+          >
+            <PasswordInput
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              placeholder={`Tối thiểu ${MIN_LEN} ký tự`}
+              autoComplete="new-password"
+              autoFocus
+            />
           </Field>
-          <Field label="Nhập lại mật khẩu" required>
-            <Input type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} placeholder="••••••••" />
+          <Field
+            label="Nhập lại mật khẩu"
+            required
+            error={mismatch ? "Mật khẩu nhập lại không khớp." : undefined}
+          >
+            <PasswordInput
+              value={pw2}
+              onChange={(e) => setPw2(e.target.value)}
+              placeholder="••••••••"
+              autoComplete="new-password"
+            />
           </Field>
         </div>
 
-        <Button type="submit" size="lg" loading={loading} className="mt-6 w-full">
-          Đổi mật khẩu & tiếp tục
+        {matched && (
+          <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-success">
+            <Check className="size-3.5" /> Mật khẩu khớp, sẵn sàng tiếp tục.
+          </p>
+        )}
+
+        <Button type="submit" size="lg" loading={loading} disabled={!canSubmit} className="mt-6 w-full">
+          Đổi mật khẩu &amp; tiếp tục
         </Button>
 
         <button

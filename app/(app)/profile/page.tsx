@@ -13,6 +13,7 @@ import { viAuthError } from "@/lib/auth-errors";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ROLE_LABELS } from "@/lib/constants";
@@ -149,13 +150,17 @@ export default function ProfilePage() {
 
           <div className="flex flex-col gap-4">
             <Field label="Mật khẩu hiện tại" required>
-              <Input type="password" value={curPw} onChange={(e) => setCurPw(e.target.value)} placeholder="••••••••" autoComplete="current-password" />
+              <PasswordInput value={curPw} onChange={(e) => setCurPw(e.target.value)} placeholder="••••••••" autoComplete="current-password" />
             </Field>
             <Field label="Mật khẩu mới" required hint="Tối thiểu 6 ký tự, khác mật khẩu cũ">
-              <Input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="••••••••" autoComplete="new-password" />
+              <PasswordInput value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="••••••••" autoComplete="new-password" />
             </Field>
-            <Field label="Nhập lại mật khẩu mới" required>
-              <Input type="password" value={newPw2} onChange={(e) => setNewPw2(e.target.value)} placeholder="••••••••" autoComplete="new-password" />
+            <Field
+              label="Nhập lại mật khẩu mới"
+              required
+              error={newPw2.length > 0 && newPw !== newPw2 ? "Mật khẩu nhập lại không khớp." : undefined}
+            >
+              <PasswordInput value={newPw2} onChange={(e) => setNewPw2(e.target.value)} placeholder="••••••••" autoComplete="new-password" />
             </Field>
             <Button onClick={savePassword} loading={savingPw} variant="secondary" className="self-start">
               <KeyRound className="size-4" /> Đổi mật khẩu

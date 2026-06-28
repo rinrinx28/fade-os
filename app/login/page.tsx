@@ -3,20 +3,32 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
-import { toast } from "sonner";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShieldCheck, AlertCircle } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured, env } from "@/lib/env";
+import { viAuthError } from "@/lib/auth-errors";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Logo } from "@/components/brand/logo";
+
+type Stage = "idle" | "auth" | "gate";
+
+const STAGE_LABEL: Record<Exclude<Stage, "idle">, string> = {
+  auth: "Đang đăng nhập…",
+  gate: "Đang kiểm tra quyền truy cập…",
+};
 
 export default function LoginPage() {
   const router = useRouter();
   const rootRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [stage, setStage] = useState<Stage>("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  const loading = stage !== "idle";
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -28,40 +40,67 @@ export default function LoginPage() {
     return () => ctx.revert();
   }, []);
 
+  function fail(message: string) {
+    setError(message);
+    // Rung nhẹ form để báo lỗi rõ ràng hơn toast.
+    if (formRef.current) {
+      gsap.fromTo(
+        formRef.current,
+        { x: -8 },
+        { x: 0, duration: 0.5, ease: "elastic.out(1, 0.35)" },
+      );
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
+
     if (!isSupabaseConfigured) {
-      toast.error("Chưa cấu hình Supabase. Kiểm tra file .env.local.");
+      fail("Chưa cấu hình Supabase. Kiểm tra file .env.local.");
       return;
     }
-    setLoading(true);
-    try {
-      const sb = getSupabaseBrowserClient();
-      const { data: auth, error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) {
-        toast.error(error.message.includes("Invalid") ? "Email hoặc mật khẩu không đúng." : error.message);
-        return;
-      }
 
-      // Cổng kiểm tra: chỉ thành viên còn hiệu lực mới được vào.
-      const { data: member } = await sb
-        .from("fade_os_members")
-        .select("user_id, active")
-        .eq("user_id", auth.user.id)
-        .eq("active", true)
-        .maybeSingle();
-      if (!member || !member.active) {
-        await sb.auth.signOut();
-        toast.error("Tài khoản này không có quyền truy cập tiệm.");
-        return;
-      }
+    const sb = getSupabaseBrowserClient();
 
-      const next = new URLSearchParams(window.location.search).get("next") ?? "/";
-      router.push(next);
-      router.refresh();
-    } finally {
-      setLoading(false);
+    // Lớp 1 — Xác thực email/mật khẩu với Supabase Auth.
+    setStage("auth");
+    const { data: auth, error: authError } = await sb.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
+    if (authError) {
+      setStage("idle");
+      fail(viAuthError(authError.message));
+      return;
     }
+
+    // Lớp 2 — Cổng "bảo table": chỉ thành viên còn hiệu lực mới được vào tiệm.
+    setStage("gate");
+    const { data: member, error: gateError } = await sb
+      .from("fade_os_members")
+      .select("user_id, active")
+      .eq("user_id", auth.user.id)
+      .eq("active", true)
+      .maybeSingle();
+
+    if (gateError) {
+      await sb.auth.signOut();
+      setStage("idle");
+      fail("Không kiểm tra được quyền truy cập. Vui lòng thử lại sau ít phút.");
+      return;
+    }
+    if (!member?.active) {
+      await sb.auth.signOut();
+      setStage("idle");
+      fail("Đăng nhập đúng, nhưng tài khoản chưa thuộc tiệm nào. Liên hệ chủ tiệm để được thêm vào.");
+      return;
+    }
+
+    // Thành công — chuyển vào hệ thống (giữ stage để nút vẫn ở trạng thái loading).
+    const next = new URLSearchParams(window.location.search).get("next") ?? "/";
+    router.push(next);
+    router.refresh();
   }
 
   return (
@@ -102,7 +141,7 @@ export default function LoginPage() {
 
       {/* Form panel */}
       <main className="flex items-center justify-center px-6 py-12">
-        <form onSubmit={handleSubmit} className="lg-form w-full max-w-sm">
+        <form ref={formRef} onSubmit={handleSubmit} className="lg-form w-full max-w-sm" noValidate>
           <div className="mb-8 flex items-center gap-2.5 text-copper-deep lg:hidden">
             <Logo className="size-8" />
             <span className="font-display text-lg font-semibold tracking-tight">FADE OS</span>
@@ -116,29 +155,57 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="username"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (error) setError(null);
+                }}
                 placeholder="ban@tiem.com"
                 required
+                disabled={loading}
               />
             </Field>
             <Field label="Mật khẩu">
-              <Input
-                type="password"
+              <PasswordInput
                 autoComplete="current-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (error) setError(null);
+                }}
                 placeholder="••••••••"
                 required
+                disabled={loading}
               />
             </Field>
           </div>
 
+          {error && (
+            <div
+              role="alert"
+              className="mt-4 flex items-start gap-2.5 rounded-xl border border-danger/20 bg-danger-soft px-3.5 py-3 text-sm text-danger"
+            >
+              <AlertCircle className="mt-0.5 size-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
           <Button type="submit" size="lg" loading={loading} className="mt-7 w-full">
-            Vào hệ thống
-            <ArrowRight className="size-4" />
+            {stage === "idle" ? (
+              <>
+                Vào hệ thống
+                <ArrowRight className="size-4" />
+              </>
+            ) : (
+              STAGE_LABEL[stage]
+            )}
           </Button>
 
-          <p className="mt-6 text-center text-sm text-ink-muted">
+          <p className="mt-5 flex items-center justify-center gap-1.5 text-xs text-ink-faint">
+            <ShieldCheck className="size-3.5" />
+            Chỉ thành viên của tiệm mới truy cập được.
+          </p>
+
+          <p className="mt-4 text-center text-sm text-ink-muted">
             Quên mật khẩu? Liên hệ <b className="text-ink-soft">chủ tiệm</b> để được cấp lại.
           </p>
         </form>

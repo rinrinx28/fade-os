@@ -3,7 +3,7 @@
 import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
-const baseField =
+export const inputBase =
   "w-full rounded-xl border border-line bg-paper px-3.5 text-[0.95rem] text-ink " +
   "placeholder:text-ink-faint transition-colors duration-(--dur-fast) " +
   "focus:border-copper focus:outline-none focus:ring-2 focus:ring-copper/15 " +
@@ -39,7 +39,7 @@ export function Field({ label, hint, error, required, children, className }: Fie
 
 export const Input = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
   function Input({ className, ...props }, ref) {
-    return <input ref={ref} className={cn(baseField, "h-11", className)} {...props} />;
+    return <input ref={ref} className={cn(inputBase, "h-11", className)} {...props} />;
   },
 );
 
@@ -47,7 +47,7 @@ export const Textarea = forwardRef<
   HTMLTextAreaElement,
   React.TextareaHTMLAttributes<HTMLTextAreaElement>
 >(function Textarea({ className, ...props }, ref) {
-  return <textarea ref={ref} className={cn(baseField, "min-h-20 py-2.5", className)} {...props} />;
+  return <textarea ref={ref} className={cn(inputBase, "min-h-20 py-2.5", className)} {...props} />;
 });
 
 export const Select = forwardRef<
@@ -55,7 +55,7 @@ export const Select = forwardRef<
   React.SelectHTMLAttributes<HTMLSelectElement>
 >(function Select({ className, children, ...props }, ref) {
   return (
-    <select ref={ref} className={cn(baseField, "h-11 cursor-pointer pr-9", className)} {...props}>
+    <select ref={ref} className={cn(inputBase, "h-11 cursor-pointer pr-9", className)} {...props}>
       {children}
     </select>
   );
